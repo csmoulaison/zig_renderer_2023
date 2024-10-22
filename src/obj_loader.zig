@@ -90,11 +90,9 @@ fn parseVertexSpec(spec: []const u8) !Vertex {
 }
 
 pub fn loadFile(allocator: std.mem.Allocator, path: []const u8) !Model {
-	std.debug.print("Load file now?\n", .{});
     var file = try std.fs.cwd().openFile(path, .{ .mode = .read_only });
     defer file.close();
 
-	std.debug.print("Load now?\n", .{});
     return load(allocator, file.reader());
 }
 
@@ -133,9 +131,7 @@ pub fn load(
     var line_reader = lineIterator(allocator, stream);
     defer line_reader.deinit();
 
-	std.debug.print("Obj\n", .{});
     while (try line_reader.next()) |line| {
-	    std.debug.print("  Obj line\n", .{});
         errdefer {
             log.err("error parsing line: '{s}'", .{line});
         }

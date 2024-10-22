@@ -14,7 +14,6 @@ pub const Platform = struct {
     // SDL stuff
     window: *sdl.SDL_Window = undefined,
     surface: *sdl.SDL_Surface = undefined,
-    renderer: *sdl.SDL_Renderer = undefined,
     // Input state
     keydowns: [MAX_SCANCODE_CHECK]sdl.SDL_Scancode = std.mem.zeroes([256]c_uint),
     keyups: [MAX_SCANCODE_CHECK]sdl.SDL_Scancode = std.mem.zeroes([256]c_uint),
@@ -32,21 +31,13 @@ pub const Platform = struct {
 pub fn init(platform: *Platform, canvas: *Canvas) void {
     _ = sdl.SDL_Init(sdl.SDL_INIT_EVERYTHING);
 
-    const res_window = sdl.SDL_CreateWindow("SDL Test", sdl.SDL_WINDOWPOS_CENTERED, sdl.SDL_WINDOWPOS_CENTERED, canvas.*.width, canvas.*.height, 0);
+    const res_window = sdl.SDL_CreateWindow("SDL Test", sdl.SDL_WINDOWPOS_CENTERED, sdl.SDL_WINDOWPOS_CENTERED, canvas.*.width, canvas.*.height, sdl.SDL_WINDOW_BORDERLESS);
     if(res_window == null or res_window == undefined) {
 	    std.debug.print("Window could not be created!\n", .{});
     } else {
 	    std.debug.print("Window created.\n", .{});
     }
     platform.window = res_window.?;
-
-    const res_renderer = sdl.SDL_CreateRenderer(platform.window, 0, sdl.SDL_RENDERER_ACCELERATED);
-    if (res_renderer == null or res_renderer == undefined) {
-	    std.debug.print("Renderer could not be created!\n", .{});
-    } else {
-	    std.debug.print("Renderer created.\n", .{});
-	}
-	platform.renderer = res_renderer.?;
 
 	const res_surface = sdl.SDL_GetWindowSurface(platform.window);
     if (res_surface == null or res_surface == undefined) {
@@ -59,7 +50,7 @@ pub fn init(platform: *Platform, canvas: *Canvas) void {
     platform.arena_allocator = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     platform.resource_allocator = platform.arena_allocator.allocator();
 
-    const model: obj.Model = obj.loadFile(platform.resource_allocator, "head.obj") catch undefined;
+    const model: obj.Model = obj.loadFile(platform.resource_allocator, "column.obj") catch undefined;
     platform.columns = load_mesh(&model, platform.resource_allocator) catch undefined;
 
     _ = sdl.SDL_SetRelativeMouseMode(sdl.SDL_TRUE);
@@ -70,7 +61,7 @@ pub fn present_canvas_to_surface(canvas: *Canvas, window: *sdl.SDL_Window, surfa
     var y: i32 = 0;
     while (y < canvas.height) : (y += 1) {
         var x: i32 = 0;
-        while (x < canvas.height) : (x += 1) {
+        while (x < canvas.width) : (x += 1) {
             const pixel_index: usize = @intCast(y * canvas.width + x);
             const c: @Vector(4, u8) = canvas.pixels[pixel_index];
             const sdl_color: u32 = sdl.SDL_MapRGBA(surface.format, c[0], c[1], c[2], c[3]);
@@ -86,7 +77,6 @@ pub fn present_canvas_to_surface(canvas: *Canvas, window: *sdl.SDL_Window, surfa
 
 pub fn cleanup(platform: *Platform) void {
     sdl.SDL_DestroyWindow(platform.window);
-    sdl.SDL_DestroyRenderer(platform.renderer);
     sdl.SDL_Quit();
     platform.arena_allocator.deinit();
 }

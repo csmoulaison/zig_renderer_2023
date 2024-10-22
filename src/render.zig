@@ -34,8 +34,6 @@ pub fn render_world_to_canvas(world: *World, canvas: *Canvas) void {
 
         // Render triangles
         for(mesh.tris) |tri_loc| { // triangle_local space
-			std.debug.print("  Tri\n", .{});
-        
             var tri_mwv: [3]@Vector(3, f32) = undefined;
             var i: usize = 0;
             while(i < 3) : (i += 1) {
@@ -48,13 +46,14 @@ pub fn render_world_to_canvas(world: *World, canvas: *Canvas) void {
 
 pub fn render_triangle(triangle: *[3]@Vector(3, f32), canvas: *Canvas) void {
     const projection: Projection = Projection.Perspective;
-    const fov: f32 = 2; // radians
+    const fov: f32 = 1.5; // radians
     const znear: f32 = 0.1;
     const zfar: f32 = 100;
 
     const width: f32 = @floatFromInt(canvas.width);
     const height: f32 = @floatFromInt(canvas.height);
-    const aspect: f32 = height / width;
+    // const aspect: f32 = height / width;
+    const aspect: f32 = width / height;
     const aspect_scalar: @Vector(3, f32) = @splat(aspect);
 
     const proj_mat: [4]@Vector(4, f32) = .{
@@ -81,7 +80,7 @@ pub fn render_triangle(triangle: *[3]@Vector(3, f32), canvas: *Canvas) void {
         }
 
         screen_coords[j] = .{ 
-            (norm_device_pos[0] + 1) * width / 2, 
+            (norm_device_pos[0] + 1) * width / 2,
             (norm_device_pos[1] + 1) * height / 2,
             norm_device_pos[2]
         };

@@ -30,9 +30,6 @@ const Canvas = @import("draw.zig").Canvas;
 const World = @import("world.zig").World;
 const Input = @import("input.zig").Input;
 
-const CANVAS_WIDTH = @import("draw.zig").WIDTH;
-const CANVAS_HEIGHT = @import("draw.zig").HEIGHT;
-
 const clear = @import("draw.zig").clear;
 const load_mesh = @import("mesh.zig").load_mesh;
 const render_world_to_canvas = @import("render.zig").render_world_to_canvas;
